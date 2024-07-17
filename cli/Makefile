@@ -18,6 +18,13 @@
 
 # Makefile for building packETHcli
 
+ifeq ("$(origin D)", "command line")
+  DEBUG = $(V)
+endif
+ifndef DEBUG
+  DEBUG = 0
+endif
+
 SHELL = /bin/sh
 prefix = /usr
 includedir = /usr/src/include
@@ -34,6 +41,9 @@ LDFLAGS += -lm -lpthread
 CFLAGS += -Wall -Wunused -Wmissing-prototypes
 CFLAGS += -Wmissing-declarations -Werror -O3
 
+ifeq ($(DEBUG),1)
+  CFLAGS += -g
+endif # DEBUG
 
 
 PROGRAM = packETHcli
