@@ -1,6 +1,6 @@
 # packETHcli - ethernet packet generator
 # By Miha Jemec <jemcek@gmail.com>
-# Copyright 2014 Miha Jemec, 
+# Copyright 2014 Miha Jemec,
 
 # This program is free software; you can redistribute it and/or
 # modify it under the terms of the GNU General Public License
@@ -26,29 +26,22 @@ INSTALL = /usr/bin/install -c
 INSTALL_DATA = ${INSTALL} -m 644
 INSTALL_PREFIX = /usr
 
-CC = gcc
-CPPFLAGS =  
+CC ?= gcc
+LD ?= gcc
+CPPFLAGS =
 
-LDFLAGS = 
-CFLAGS = -g -Wall -Wunused -Wmissing-prototypes -Wmissing-declarations -Werror
-CFLAGS += -O3
-LIBS =  -lm  -lpthread
+LDFLAGS += -lm -lpthread
+CFLAGS += -Wall -Wunused -Wmissing-prototypes
+CFLAGS += -Wmissing-declarations -Werror -O3
 
-SOURCES = cli_send.c parse_snort_rules.c
 
-OBJECTS =  cli_send.o parse_snort_rules.o
 
 PROGRAM = packETHcli
 
-COMPILE = $(CC) $(CFLAGS) $(CPPFLAGS)
-
 all: $(PROGRAM)
 
-$(PROGRAM): $(OBJECTS)
-	$(CC) $(CFLAGS) $(LDFLAGS) $(OBJECTS) $(LIBS) -o $@
-
-%.o: %.c
-	$(COMPILE) -c $<
+$(PROGRAM): cli_send.o parse_snort_rules.o
+	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
 
 install: $(PROGRAM)
 	$(INSTALL) $(PROGRAM) $(DESTDIR)/$(INSTALL_PREFIX)/bin/$(PROGRAM)
@@ -56,8 +49,8 @@ install: $(PROGRAM)
 	$(INSTALL_DATA) pixmaps/* $(DESTDIR)/$(INSTALL_PREFIX)/share/pixmaps/$(PROGRAM)
 
 test:
-	$(CC) $(CFLAGS) $(LDFLAGS) -DTEST_SNORT_RULE_PARSING parse_snort_rules.c -o parse_snort_rules
+	$(CC) $(CFLAGS) $(LDFLAGS) -DTEST_SNORT_RULE_PARSING \
+	  parse_snort_rules.c -o parse_snort_rules
 
 clean:
-	rm -f $(OBJECTS) $(PROGRAM) *~ parse_snort_rules
-
+	rm -f *.o *~ parse_snort_rules $(PROGRAM)
