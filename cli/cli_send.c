@@ -1728,6 +1728,8 @@ void onexit(int signum)
 
 }
 
+#if defined(__x86_64__) || defined(_M_X64) || defined(i386) || \
+	defined(__i386__) || defined(__i386) || defined(_M_IX86)
 /*------------------------------------------------------------------------------*/
 inline __sum16
 ip_fast_csum(const void *iph, unsigned int ihl)
@@ -1759,6 +1761,14 @@ ip_fast_csum(const void *iph, unsigned int ihl)
         : "memory");
     return (__sum16)sum;
 }
+#else /* !x86 */
+inline __sum16
+ip_fast_csum(const void *iph, unsigned int ihl)
+{
+	return (__sum16)0;
+}
+#endif /* x86 */
+
 /*------------------------------------------------------------------------------*/
 uint16_t
 TCPChecksum(uint16_t* buf1, int buf1len, uint16_t* buf2, int buf2len)

@@ -26,20 +26,22 @@ ifndef DEBUG
 endif
 
 SHELL = /bin/sh
-prefix = /usr
-includedir = /usr/src/include
 
 INSTALL = /usr/bin/install -c
 INSTALL_DATA = ${INSTALL} -m 644
-INSTALL_PREFIX = /usr
+PREFIX ?= /usr
 
-CC ?= gcc
-LD ?= gcc
+CC := $(CROSS_COMPILE)$(CC)
+LD := $(CROSS_COMPILE)$(LD)
 CPPFLAGS =
 
 LDFLAGS += -lm -lpthread
 CFLAGS += -Wall -Wunused -Wmissing-prototypes
 CFLAGS += -Wmissing-declarations -Werror -O3
+ifdef SYSROOT
+  CFLAGS += --sysroot=$(SYSROOT)
+  LDFLAGS += --sysroot=$(SYSROOT)
+endif
 
 ifeq ($(DEBUG),1)
   CFLAGS += -g
@@ -54,9 +56,11 @@ $(PROGRAM): cli_send.o parse_snort_rules.o
 	$(CC) $(CFLAGS) $(LDFLAGS) $^ -o $@
 
 install: $(PROGRAM)
-	$(INSTALL) $(PROGRAM) $(DESTDIR)/$(INSTALL_PREFIX)/bin/$(PROGRAM)
-	if [ ! -d $(DESTDIR)/$(INSTALL_PREFIX)/share/pixmaps/$(PROGRAM) ]; then mkdir -p $(DESTDIR)/$(INSTALL_PREFIX)/share/pixmaps/$(PROGRAM); fi
-	$(INSTALL_DATA) pixmaps/* $(DESTDIR)/$(INSTALL_PREFIX)/share/pixmaps/$(PROGRAM)
+	$(INSTALL) $(PROGRAM) $(PREFIX)/bin/$(PROGRAM)
+	if [ ! -d $(PREFIX)/share/pixmaps/$(PROGRAM) ]; then \
+	  mkdir -p $(PREFIX)/share/pixmaps/$(PROGRAM); \
+	fi
+	$(INSTALL_DATA) pixmaps/* $(PREFIX)/share/pixmaps/$(PROGRAM)
 
 test:
 	$(CC) $(CFLAGS) $(LDFLAGS) -DTEST_SNORT_RULE_PARSING \
